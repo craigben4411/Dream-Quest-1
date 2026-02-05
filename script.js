@@ -1,3 +1,70 @@
+let gameMode = null;
+let startTime = null;
+let timerInterval = null;
+
+const modeSelect = document.getElementById("modeSelect");
+const practiceBtn = document.getElementById("practiceBtn");
+const speedrunBtn = document.getElementById("speedrunBtn");
+const hud = document.getElementById("hud");
+const timerDisplay = document.getElementById("timer");
+
+practiceBtn.onclick = () => startGame("practice");
+speedrunBtn.onclick = () => startGame("speedrun");
+
+function startGame(mode) {
+  gameMode = mode;
+  modeSelect.style.display = "none";
+
+  if (mode === "speedrun") {
+    hud.style.display = "block";
+    startTimer();
+  }
+}
+
+function startTimer() {
+  startTime = performance.now();
+  timerInterval = setInterval(() => {
+    const elapsed = performance.now() - startTime;
+    timerDisplay.textContent = formatTime(elapsed);
+  }, 10);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  const finalTime = performance.now() - startTime;
+  saveTime(finalTime);
+}
+
+function formatTime(ms) {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  const millis = Math.floor(ms % 1000);
+  return `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}.${String(millis).padStart(3,"0")}`;
+}
+function saveTime(time) {
+  let name = prompt("Enter your name (3–10 chars):");
+  if (!name) return;
+
+  name = name.substring(0, 10);
+
+  let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+
+  scores.push({ name, time });
+  scores.sort((a, b) => a.time - b.time);
+  scores = scores.slice(0, 10);
+
+  localStorage.setItem("leaderboard", JSON.stringify(scores));
+  showLeaderboard(scores);
+}
+
+function showLeaderboard(scores) {
+  let board = "🏆 Leaderboard 🏆\n\n";
+  scores.forEach((s, i) => {
+    board += `${i + 1}. ${s.name} - ${formatTime(s.time)}\n`;
+  });
+  alert(board);
+}
+
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x000000, 5, 25);
 
@@ -86,7 +153,8 @@ createFragment(6, 2);
 createFragment(0, 6);
 
 // Boss
-let boss, bossHealth = 5;
+let boss, bossHealth = 5; if (gameMode === "speedrun") stopTimer();
+
 
 function spawnBoss() {
   boss = new THREE.Mesh(
