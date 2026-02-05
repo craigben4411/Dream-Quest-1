@@ -23,3 +23,30 @@ body {
   left: 10px;
   color: white;
 }
+#modeSelect {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+#modeSelect button {
+  margin: 10px;
+  padding: 15px 30px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#hud {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: white;
+  font-family: monospace;
+  font-size: 18px;
+}
